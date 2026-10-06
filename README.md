@@ -55,19 +55,20 @@ Assets/Scripts/
 ├── MagicSocket.cs
 └── PuzzleLogic.cs
 ```
-AutoOrientSnap
+### AutoOrientSnap
 
 Handles rotational normalization of interactable puzzle elements.
 
-MagicSocket
+### MagicSocket
 
 Maps XR snap interactions to application actions such as level loading and menu navigation.
 
-PuzzleLogic
+### PuzzleLogic
 
 Handles puzzle validation, level lifecycle, progress persistence and completion feedback.
 
-Project Status
+### Project Status
+
 This repository represents a gameplay prototype focused on spatial interaction and puzzle mechanics rather than a production-ready game.
 The project was later cleaned and documented as part of my gameplay programming portfolio.
 
