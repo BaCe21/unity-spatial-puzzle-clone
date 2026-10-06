@@ -1,25 +1,35 @@
-using UnityEngine;
 using Oculus.Interaction;
+using UnityEngine;
 
 public class MagicSocket : MonoBehaviour
 {
     public enum ActionType
     {
-        LoadSpecificLevel,  
+        LoadSpecificLevel,
         LoadLatestLevel,
         QuitApplication
     }
 
-    [Header("Co ma robić ten Socket?")]
-    public ActionType actionType;
+    [Header("Action")]
+    [SerializeField] private ActionType actionType;
 
-    [Header("Jeśli 'LoadSpecificLevel', który to index?")]
-    public int levelIndexToLoad = 0;
+    [SerializeField]
+    [Min(0)]
+    private int levelIndexToLoad;
 
-    [Header("Podłącz tutaj SnapInteractable z tego obiektu")]
-    public SnapInteractable mySocket;
+    [Header("References")]
+    [SerializeField] private SnapInteractable mySocket;
+    [SerializeField] private PuzzleLogic puzzleLogic;
 
-    void Start()
+    private void Awake()
+    {
+        if (puzzleLogic == null)
+        {
+            puzzleLogic = FindAnyObjectByType<PuzzleLogic>();
+        }
+    }
+
+    private void OnEnable()
     {
         if (mySocket != null)
         {
@@ -27,7 +37,7 @@ public class MagicSocket : MonoBehaviour
         }
     }
 
-    void OnDestroy()
+    private void OnDisable()
     {
         if (mySocket != null)
         {
@@ -43,28 +53,40 @@ public class MagicSocket : MonoBehaviour
         }
     }
 
-   void PerformAction()
+    private void PerformAction()
     {
-        var manager = FindAnyObjectByType<PuzzleLogic>();
-        
-        if (manager == null) return;
+        if (actionType == ActionType.QuitApplication)
+        {
+            QuitApplication();
+            return;
+        }
+
+        if (puzzleLogic == null)
+        {
+            Debug.LogWarning(
+                $"{nameof(MagicSocket)} on {name} cannot find {nameof(PuzzleLogic)}."
+            );
+            return;
+        }
 
         switch (actionType)
         {
             case ActionType.LoadSpecificLevel:
-                manager.SpawnLevel(levelIndexToLoad);
+                puzzleLogic.SpawnLevel(levelIndexToLoad);
                 break;
 
             case ActionType.LoadLatestLevel:
-                manager.LoadSavedLevel();
-                break;
-
-            case ActionType.QuitApplication:
-                Application.Quit();
-                #if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = false;
-                #endif
+                puzzleLogic.LoadSavedLevel();
                 break;
         }
+    }
+
+    private static void QuitApplication()
+    {
+        Application.Quit();
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 }

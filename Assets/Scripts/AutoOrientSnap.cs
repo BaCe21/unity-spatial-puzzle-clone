@@ -1,16 +1,17 @@
-using UnityEngine;
 using Oculus.Interaction;
+using UnityEngine;
 
 public class AutoOrientSnap : MonoBehaviour
 {
-    [Tooltip("Smart_Anchor")]
-    public Transform attachPoint; 
+    [Header("References")]
+    [SerializeField] private Transform attachPoint;
+    [SerializeField] private SnapInteractor snapInteractor;
 
-    [Tooltip("Snap Interactor")]
-    public SnapInteractor snapInteractor;
-
-    void Update()
+    private void Update()
     {
+        if (attachPoint == null || snapInteractor == null)
+            return;
+
         if (snapInteractor.State == InteractorState.Select)
             return;
 
@@ -20,11 +21,12 @@ public class AutoOrientSnap : MonoBehaviour
         float snappedY = Mathf.Round(currentEuler.y / 90f) * 90f;
         float snappedZ = Mathf.Round(currentEuler.z / 90f) * 90f;
 
+        Quaternion snappedRotation = Quaternion.Euler(
+            snappedX,
+            snappedY,
+            snappedZ
+        );
 
-        Quaternion targetRotation = Quaternion.Euler(snappedX, snappedY, snappedZ);
-
-        attachPoint.localRotation = Quaternion.Inverse(targetRotation) * transform.rotation;
-        
-        attachPoint.localRotation = Quaternion.Inverse(targetRotation);
+        attachPoint.localRotation = Quaternion.Inverse(snappedRotation);
     }
 }
